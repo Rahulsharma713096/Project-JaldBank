@@ -115,5 +115,40 @@ public boolean logIn() {
 	}
 	return false;
 }
+public boolean checkBalance() {
+	String s="select balance from jaldbank where accno=?";
+	 try {
+		pstmt = con.prepareStatement(s);
+		pstmt.setInt(1,accno);
+	        res = pstmt.executeQuery();
+	      //if res having value of data then it enter in loop
+			while(res.next()==true) {
+				bal=res.getInt("balance");
+				System.out.println(bal);
+				return true;
+			}   
+	} catch (SQLException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	}
+	 
+	return false;
+}
+public boolean changePassword() {
+	
+	String s="update jaldbank set password=? where accno=?";
+	 try {
+		pstmt = con.prepareStatement(s);
+		pstmt.setString(1,pwd);
+		pstmt.setInt(2,accno);
+	        int x = pstmt.executeUpdate();
+	      if(x>0) return true;
+	} catch (SQLException e) {
+	
+		e.printStackTrace();
+	}
+	 
+	return false;
+}
  
 }
