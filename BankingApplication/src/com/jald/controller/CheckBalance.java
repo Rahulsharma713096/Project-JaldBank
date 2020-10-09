@@ -15,7 +15,8 @@ public class CheckBalance extends HttpServlet {
 
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
-	       HttpSession session = req.getSession();
+	 try {     
+		HttpSession session = req.getSession();
 	        int accno = (int) session.getAttribute("accno");	
 		try {
 			Model m = new Model();
@@ -34,6 +35,9 @@ public class CheckBalance extends HttpServlet {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	 }catch(Exception e) {
+		 res.sendRedirect("/BankingApplication/Login.html");
+	 }
 	}
 
    

@@ -17,7 +17,6 @@
 		<url-pattern>/ChangePassword</url-pattern>
 		<dispatcher>REQUEST</dispatcher>
 	</filter-mapping>
-	
 	<welcome-file-list>
 		<welcome-file>Welcome.html</welcome-file>
 		<welcome-file>index.htm</welcome-file>

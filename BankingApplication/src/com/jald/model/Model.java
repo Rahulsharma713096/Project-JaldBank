@@ -5,6 +5,8 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Map;
+import java.util.TreeMap;
 
 public class Model {
 	//Database Columns
@@ -14,10 +16,20 @@ public class Model {
  private String pwd;
  private int bal;
  private String email;
+ private int raccno;
+ 
+public int getRaccno() {
+	return raccno;
+}
+public void setRaccno(int raccno) {
+	this.raccno = raccno;
+}
 private Connection con;
 private PreparedStatement pstmt;
 private int x;
 private ResultSet res;
+private PreparedStatement prepareStatement;
+
 public String getName() {
 	return name;
 }
@@ -149,6 +161,117 @@ public boolean changePassword() {
 	}
 	 
 	return false;
+}
+public boolean transfer() throws SQLException {
+	
+    String s1="select * from jaldbank where accno=?";
+           pstmt= con.prepareStatement(s1);
+           pstmt.setInt(1,raccno);
+           ResultSet res1 = pstmt.executeQuery();
+         while(res1.next()==true) {
+    	String s2="update jaldbank set balance=balance-? where accno=?";
+    	 prepareStatement = con.prepareStatement(s2);
+    	 prepareStatement.setInt(1,bal);
+    	 prepareStatement.setInt(2,accno);
+    	 int x = prepareStatement.executeUpdate();
+    	 System.out.println("balance deducted from"+accno);
+   try {
+    	 if(x>0) {
+    		 int bal1 = res1.getInt("balance");
+    		 System.out.println(bal1);
+    		 if(bal1>0&&bal1>bal) {
+    			 String s3="update jaldbank set balance=balance+? where accno=?";
+    	    	 prepareStatement = con.prepareStatement(s3);
+    	    	 prepareStatement.setInt(1,bal);
+    	    	 prepareStatement.setInt(2,raccno);
+    	    	 int x1 = prepareStatement.executeUpdate();
+    	    	 System.out.println("balance sucessfully inserted to reciver account"+raccno);
+   try {
+    	  	 if(x1>0) {
+    	    		 String s4="insert into getstatement values(?,?,?)";
+    	    		 prepareStatement = con.prepareStatement(s4);
+    	    		 prepareStatement.setInt(1,accno);
+    	    		 prepareStatement.setInt(2,raccno);
+    	    		 prepareStatement.setInt(3,bal);
+    	    		 int executeUpdate = prepareStatement.executeUpdate();
+    	    		 if(executeUpdate>0) {
+    	    			 System.out.println("Balance transfer sucessfully");
+    	    			 return true;
+    	    		 }else {
+    	    			 //Get statement coudn't be update 
+    	    			 System.out.println("ststment coudn't be updated");
+    	    			 }
+  
+    	    	 }
+                else {
+    	    		//balance not update to receiver account
+    	    		 System.out.println("balance not update to reciver account");
+    	    		 String s5="update jaldbank set balance=balance+? where accno=?";
+        	    	 prepareStatement = con.prepareStatement(s5);
+        	    	 prepareStatement.setInt(1,bal);
+        	    	 prepareStatement.setInt(2,accno);
+        	    	 int x2 = prepareStatement.executeUpdate();
+        	    	 if(x2>0)System.out.println("balance return to account");
+        			 return false; 
+    	    	 }}catch(Exception e) {
+    	    		 return true;
+    	    	 }
+    		 }
+    		 else {
+    			 //balance either lessthan 0 or less than sending amount
+	    		 System.out.println("balance either lessthan 0 or less than sending amount");
+    			 String s5="update jaldbank set balance=balance+? where accno=?";
+    	    	 prepareStatement = con.prepareStatement(s5);
+    	    	 prepareStatement.setInt(1,bal);
+    	    	 prepareStatement.setInt(2,accno);
+    	    	 int x2 = prepareStatement.executeUpdate();
+    	    	 if(x2>0)System.out.println("balance return to account");
+    			 return false; 
+    		 }
+    	 }
+   }catch(Exception e){
+		//some problem occur after execution of s2 SQL query
+		 System.out.println("some problem occur after execution of s2 SQL query");
+		 String s5="update jaldbank set balance=balance+? where accno=?";
+  	 prepareStatement = con.prepareStatement(s5);
+  	 prepareStatement.setInt(1,bal);
+  	 prepareStatement.setInt(2,accno);
+  	 int x2 = prepareStatement.executeUpdate();
+  	 if(x2>0)System.out.println("balance return to account");
+		 return false; 
+	}
+    }
+	return false;
+}
+@SuppressWarnings("rawtypes")
+public Map Statementdata=new TreeMap<>();
+@SuppressWarnings({ "rawtypes", "unchecked" })
+public Map getStatement() {
+   String s1="select * from getstatement where accno=?";
+   String s2="select * from getstatement where raccno=?";
+   
+   try {
+	   //For Amount sending transaction
+	pstmt = con.prepareStatement(s1);
+	pstmt.setInt(1,accno);
+	  res= pstmt.executeQuery();
+	  int x=1;
+	while(res.next()==true) {
+		Statementdata.put("debit:"+x++,res.getInt("amount"));
+	}
+	//For Amount Receiving transaction
+	pstmt = con.prepareStatement(s2);
+	pstmt.setInt(1,accno);
+	  res= pstmt.executeQuery();
+	  x=1;
+	while(res.next()==true) {
+		Statementdata.put("credit:"+x++,res.getInt("amount"));
+	}
+	
+} catch (SQLException e) {
+	e.printStackTrace();
+}
+	return Statementdata;
 }
  
 }
