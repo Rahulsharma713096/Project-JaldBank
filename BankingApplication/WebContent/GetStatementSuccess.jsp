@@ -17,6 +17,6 @@
 
 %>
 <h3>Home Page <a href="Home.html">|click here|</a>  </h3>
-<h2>Logout  <a href="Login.html">|click here|</a></h2>
+<h2>Logout  <a href="Logout.html">|click here|</a></h2>
 </body>
 </html>

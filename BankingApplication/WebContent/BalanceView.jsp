@@ -13,8 +13,8 @@
       out.println(session.getAttribute("bal"));
       session.setAttribute("accno",session.getAttribute("accno"));
 %>
-<h3>Home Page <a href="Home.html">|click here|</a>  </h3>
-<h2>Logout  <a href="Login.html">|click here|</a></h2>
+<h3><a href="Home.html"><button>Home Page </button></a>  </h3>
+<h3><a href="Login.html"><button>Logout </button></a></h3>
 
 </body>
 </html>
