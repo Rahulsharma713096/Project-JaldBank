@@ -273,5 +273,36 @@ public Map getStatement() {
 }
 	return Statementdata;
 }
+public boolean applyLoan() throws SQLException {
+	 String s="select * from jaldbank where accno=?";
+	 pstmt = con.prepareStatement(s);
+		pstmt.setInt(1,accno);
+		  res= pstmt.executeQuery();
+		  while(res.next()==true) {
+			name=  res.getString("name");
+			email=res.getString("email");
+			return true;
+		  }
+	return false;
+}
+public void sendLoanData(String loantype) throws SQLException {
+	String s="select * from jaldbank where accno=?";
+	 pstmt = con.prepareStatement(s);
+		pstmt.setInt(1,accno);
+		  res= pstmt.executeQuery();
+		  while(res.next()==true) {
+			name=  res.getString("name");
+			email=res.getString("email");
+		  }
+	String s1="insert into loandata values(?,?,?,?)";
+	 pstmt = con.prepareStatement(s1);
+		pstmt.setInt(1,accno);
+		pstmt.setString(2,loantype);
+		pstmt.setString(3,name);
+		pstmt.setString(4,email);
+		int x = pstmt.executeUpdate();
+		if(x>0) System.out.println("Loan Data inserted");
+
+}
  
 }
